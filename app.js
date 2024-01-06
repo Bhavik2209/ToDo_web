@@ -36,13 +36,17 @@ const defaultItems = [item1,item2,item3];
 //GET function for home route
 app.get ("/", function(req,res){
   
-  Item.find().then((foundItem)=>{
+  Item.find({}).then((foundItem)=>{
     if(foundItem.length===0){
       Item.insertMany(defaultItems)
-      .then(function () {
-        console.log("Successfully saved defult items to DB");
-      })
-      res.render("list", {listTitle:"Today", newListItems: foundItem});
+      .then(function (err) {
+        if(!err){
+          console.log("saved successfully !");
+        }else{
+          console.log(err);
+        }
+      });
+      res.redirect("/");
     }
     else{
       res.render("list", {listTitle:"Today", newListItems: foundItem});
@@ -53,16 +57,26 @@ app.get ("/", function(req,res){
 //POST function for home route
 app.post("/", function(req, res){
   // console.log(req.body);
-const item = req.body.newItem;
+const itemName = req.body.newItem;
 
-  if(req.body.list === "Work list"){
-    workItems.push(item);
-    res.redirect ("/work");
-  }else{
-    items.push(item);
-    res.redirect ("/");
-  }
+ const item = new Item({
+  name:itemName
+ })
+ item.save();
+ res.redirect("/");
 });
+
+app.post("/delete",(req,res)=>{
+  const checkedItemId = req.body.checkbox;
+  Item.findByIdAndDelete(checkedItemId).then((err)=>{
+    if(!err){
+      console.log("successfully removed");
+    }
+    res.redirect("/");
+  })
+});
+
+
 //GET function for Work route
 app.get("/work", function(req,res){
   res.render("list", {listTitle:"Work list", newListItems:workItems});
