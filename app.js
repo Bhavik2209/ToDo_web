@@ -21,24 +21,12 @@ const Item = mongoose.model(
   "Item",itemSchema
 );
 
-const item1 = new Item({
-  name:"Welcome to your todolist"
-});
-const item2 = new Item({
-  name:"todolist"
-});
-const item3 = new Item({
-  name:"Welcome"
-});
-
-const defaultItems = [item1,item2,item3];
-
 //GET function for home route
 app.get ("/", function(req,res){
   
   Item.find({}).then((foundItem)=>{
     if(foundItem.length===0){
-      Item.insertMany(defaultItems)
+      Item.insertMany()
       .then(function (err) {
         if(!err){
           console.log("saved successfully !");
